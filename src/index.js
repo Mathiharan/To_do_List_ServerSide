@@ -1,17 +1,27 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+const tasks = require("./routes/tasks");
+const cors = require("cors");
+const mongoose = require('mongoose');
+const express = require("express");
+const app = express();
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+const mongoUri = 'mongodb+srv://admin:passwordpassword@cluster.n03kv.mongodb.net/test?retryWrites=true&w=majority';
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+mongoose.connect(mongoUri, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true
+});
+mongoose.connection.on('connected', () => {
+    console.log('Connected to mongo instance');
+});
+mongoose.connection.on('error', (err) => {
+    console.error('Error Connecting to mongo', err)
+});
+
+app.use(express.json());
+app.use(cors());
+
+app.use("/api/tasks", tasks);
+
+const port = process.env.PORT || 8080;
+app.listen(port, () => console.log(`Listening on port ${port}...`));
